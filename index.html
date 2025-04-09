@@ -4,41 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Page de création d'icônes</title>
-  <style>
-    /* Ajouter des styles pour les icônes et le conteneur */
-    #container {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-    }
-
-    .icon {
-      position: absolute;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .icon img {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-
-    .icon span {
-      font-size: 12px;
-      margin-top: 5px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 20px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">  <!-- Lien vers le fichier CSS -->
 </head>
 <body>
 
@@ -48,12 +14,12 @@
   <!-- Bouton pour ajouter une nouvelle icône -->
   <button id="addIconButton">+ Ajouter une icône</button>
 
-  <!-- Importer Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js"></script>
-
-  <script>
+  <!-- Importer Firebase SDK (Modules ES6) -->
+  <script type="module">
     // Configuration Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
       authDomain: "frenchies-4d63a.firebaseapp.com",
@@ -65,8 +31,8 @@
     };
 
     // Initialisation Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
     // Fonction pour générer un ID unique pour chaque icône
     function generateId() {
@@ -75,7 +41,7 @@
 
     // Fonction pour sauvegarder une icône dans Firebase
     function saveIcon(id, iconData) {
-      firebase.database().ref('icons/' + id).set(iconData)
+      set(ref(db, 'icons/' + id), iconData)
         .then(() => {
           console.log("Icône sauvegardée !");
         })
@@ -86,8 +52,8 @@
 
     // Fonction pour charger les icônes depuis Firebase
     function loadIcons() {
-      const iconsRef = firebase.database().ref('icons/');
-      iconsRef.on('value', (snapshot) => {
+      const iconsRef = ref(db, 'icons/');
+      onValue(iconsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
           // Supprimer toutes les icônes existantes avant de les recharger
@@ -153,28 +119,3 @@
           console.log("Aucune donnée trouvée dans Firebase");
         }
       });
-    }
-
-    // Charger les icônes au démarrage
-    loadIcons();
-
-    // Fonction pour ajouter une nouvelle icône
-    document.getElementById('addIconButton').addEventListener('click', () => {
-      const id = generateId();
-      const newIconData = {
-        id: id,
-        x: '100px',  // Position initiale
-        y: '100px',  // Position initiale
-        image: '',   // Pas d'image par défaut
-        text: ''     // Pas de texte par défaut
-      };
-
-      // Sauvegarder l'icône dans Firebase
-      saveIcon(id, newIconData);
-
-      // Recharger les icônes après l'ajout
-      loadIcons();
-    });
-  </script>
-</body>
-</html>
