@@ -94,4 +94,54 @@
 
               function onMouseMove(e) {
                 el.style.left = e.clientX - offsetX + 'px';
-                el.style.top = e.clientY - offsetY + 'px
+                el.style.top = e.clientY - offsetY + 'px';
+              }
+
+              function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+
+                // Sauvegarder la nouvelle position dans Firebase
+                const id = el.dataset.id;
+                const newIconData = {
+                  ...icon,
+                  x: el.style.left,
+                  y: el.style.top
+                };
+                saveIcon(id, newIconData);
+              }
+
+              document.addEventListener('mousemove', onMouseMove);
+              document.addEventListener('mouseup', onMouseUp);
+            });
+          });
+        } else {
+          console.log("Aucune donnée trouvée dans Firebase");
+        }
+      });
+    }
+
+    // Charger les icônes au démarrage
+    loadIcons();
+
+    // Fonction pour ajouter une nouvelle icône
+    document.getElementById('addIconButton').addEventListener('click', () => {
+      const id = generateId();
+      const newIconData = {
+        id: id,
+        x: '100px',  // Position initiale
+        y: '100px',  // Position initiale
+        image: '',   // Pas d'image par défaut
+        text: ''     // Pas de texte par défaut
+      };
+
+      // Sauvegarder l'icône dans Firebase
+      saveIcon(id, newIconData);
+
+      // Recharger les icônes après l'ajout
+      loadIcons();
+    });
+  </script>
+
+</body>
+</html>
