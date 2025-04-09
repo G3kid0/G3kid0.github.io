@@ -27,6 +27,25 @@ addIconButton.addEventListener('click', () => {
 
   makeDraggable(icon);
   container.appendChild(icon);
+
+  // Génère un ID unique pour chaque icône si elle n'en a pas encore
+if (!currentIcon.dataset.id) {
+  currentIcon.dataset.id = Date.now(); // timestamp unique
+}
+const id = currentIcon.dataset.id;
+
+// Récupère les données
+const iconData = {
+  id: id,
+  x: currentIcon.style.left,
+  y: currentIcon.style.top,
+  image: url,
+  text: text
+};
+
+// Sauvegarde dans Firebase
+db.ref('icons/' + id).set(iconData);
+
 });
 
 applyBtn.addEventListener('click', () => {
