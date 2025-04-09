@@ -21,25 +21,48 @@
   </div>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
-<script>
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+<script type="module">
+  // Importation des fonctions nécessaires depuis Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
-  authDomain: "frenchies-4d63a.firebaseapp.com",
-  projectId: "frenchies-4d63a",
-  storageBucket: "frenchies-4d63a.firebasestorage.app",
-  messagingSenderId: "270761793230",
-  appId: "1:270761793230:web:b4914660a81023dce1229f"
-};
+  // Ta configuration Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
+    authDomain: "frenchies-4d63a.firebaseapp.com",
+    projectId: "frenchies-4d63a",
+    storageBucket: "frenchies-4d63a.firebasestorage.app",
+    messagingSenderId: "270761793230",
+    appId: "1:270761793230:web:b4914660a81023dce1229f"
+  };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+  // Initialiser Firebase
+  const app = initializeApp(firebaseConfig);
+
+  // Initialiser la Realtime Database
+  const db = getDatabase(app);
+
+  // Fonction pour sauvegarder une icône
+  function saveIcon(id, iconData) {
+    set(ref(db, 'icons/' + id), iconData);
+  }
+
+  // Fonction pour charger les icônes
+  function loadIcons() {
+    const iconsRef = ref(db, 'icons/');
+    onValue(iconsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // Remplir l'interface avec les icônes existantes
+        // Ici, tu peux utiliser ton code d'affichage des icônes.
+      }
+    });
+  }
+
+  // Appelle loadIcons pour récupérer les icônes au lancement de la page
+  loadIcons();
 </script>
+
 
   <script src="script.js"></script>
 </body>
