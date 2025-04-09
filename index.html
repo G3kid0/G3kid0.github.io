@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Icônes Déplaçables</title>
-  <link rel="stylesheet" href="style.css">
-  
-  <!-- Importer Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
-  <!-- Charger le script.js -->
-  <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Icônes Mobiles</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="container">
-    <!-- Icônes seront ajoutées ici -->
+  <div class="background">
+    <button id="addIcon">+</button>
+    <div id="iconContainer"></div>
   </div>
 
-  <!-- Bouton pour ajouter une nouvelle icône -->
-  <button id="addIconButton">+ Ajouter une icône</button>
+  <!-- Popup pour modifier l'icône -->
+  <div id="popup" class="popup hidden">
+    <label>Image URL : <input type="text" id="imgUrl" placeholder="https://..."/></label><br/>
+    <label>Texte : <input type="text" id="iconText" placeholder="Texte de l'icône"/></label><br/>
+    <button id="applyChanges">Appliquer</button>
+    <button id="closePopup">Annuler</button>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
