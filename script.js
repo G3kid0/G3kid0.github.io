@@ -1,0 +1,118 @@
+// Initialiser Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
+  authDomain: "frenchies-4d63a.firebaseapp.com",
+  databaseURL: "https://frenchies-4d63a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "frenchies-4d63a",
+  storageBucket: "frenchies-4d63a.firebasestorage.app",
+  messagingSenderId: "270761793230",
+  appId: "1:270761793230:web:b4914660a81023dce1229f"
+};
+
+// Initialisation Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Fonction pour générer un ID unique
+function generateId() {
+  return 'icon-' + Math.random().toString(36).substring(2, 15);
+}
+
+// Fonction pour sauvegarder une icône dans Firebase
+function saveIcon(id, iconData) {
+  const iconRef = ref(db, 'icons/' + id);
+  set(iconRef, iconData)
+    .then(() => console.log("Icône sauvegardée !"))
+    .catch((error) => console.error("Erreur lors de la sauvegarde de l'icône", error));
+}
+
+// Fonction pour charger les icônes depuis Firebase
+function loadIcons() {
+  const iconsRef = ref(db, 'icons/');
+  get(iconsRef).then(snapshot => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      // Vider le conteneur avant de le remplir avec les nouvelles icônes
+      document.getElementById('container').innerHTML = '';
+      
+      Object.values(data).forEach(icon => {
+        const el = document.createElement('div');
+        el.className = 'icon';
+        el.style.left = icon.x;
+        el.style.top = icon.y;
+        el.dataset.id = icon.id;
+
+        // Ajouter une image si elle existe
+        if (icon.image) {
+          const img = document.createElement('img');
+          img.src = icon.image;
+          el.appendChild(img);
+        }
+
+        // Ajouter du texte si il existe
+        if (icon.text) {
+          const span = document.createElement('span');
+          span.textContent = icon.text;
+          el.appendChild(span);
+        }
+
+        // Ajouter l'icône à l'interface
+        document.getElementById('container').appendChild(el);
+
+        // Rendre l'icône déplaçable
+        el.addEventListener('mousedown', (e) => {
+          const offsetX = e.clientX - el.getBoundingClientRect().left;
+          const offsetY = e.clientY - el.getBoundingClientRect().top;
+
+          function onMouseMove(e) {
+            el.style.left = e.clientX - offsetX + 'px';
+            el.style.top = e.clientY - offsetY + 'px';
+          }
+
+          function onMouseUp() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+
+            // Sauvegarder la nouvelle position dans Firebase
+            const id = el.dataset.id;
+            const newIconData = {
+              ...icon,
+              x: el.style.left,
+              y: el.style.top
+            };
+            saveIcon(id, newIconData);
+          }
+
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+      });
+    } else {
+      console.log("Aucune donnée trouvée dans Firebase");
+    }
+  });
+}
+
+// Charger les icônes au démarrage
+loadIcons();
+
+// Fonction pour ajouter une nouvelle icône
+document.getElementById('addIconButton').addEventListener('click', () => {
+  const id = generateId();
+  const newIconData = {
+    id: id,
+    x: '100px',  // Position initiale
+    y: '100px',  // Position initiale
+    image: '',   // Pas d'image par défaut
+    text: ''     // Pas de texte par défaut
+  };
+
+  // Sauvegarder l'icône dans Firebase
+  saveIcon(id, newIconData);
+
+  // Recharger les icônes après l'ajout
+  loadIcons();
+});
