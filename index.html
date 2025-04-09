@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page avec icônes persistantes</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://via.placeholder.com/1200x800') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #addButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #addButton:hover {
+            background-color: #218838;
+        }
+
+        .icon {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            border: 2px dashed #ccc;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+        }
+
+        .icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .icon span {
+            position: absolute;
+            top: -20px;
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+        }
+
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            z-index: 1000;
+            text-align: center;
+        }
+
+        #popup input[type="text"] {
+            margin: 10px 0;
+            padding: 8px;
+            width: calc(100% - 20px);
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #popup input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        #popup button {
+            padding: 8px 15px;
+            font-size: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #popup button:hover {
+            background-color: #0056b3;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <button id="addButton">+</button>
+
+    <div id="overlay"></div>
+    <div id="popup">
+        <h3>Personnaliser l'icône</h3>
+        <input type="text" id="iconText" placeholder="Texte de l'icône">
+        <input type="file" id="iconImage" accept="image/*">
+        <button id="saveIcon">Enregistrer</button>
+    </div>
+
+    <script>
+        const addButton = document.getElementById('addButton');
+        const popup = document.getElementById('popup');
+        const overlay = document.getElementById('overlay');
+        const saveIcon = document.getElementById('saveIcon');
+        const iconTextInput = document.getElementById('iconText');
+        const iconImageInput = document.getElementById('iconImage');
+        let activeIcon = null;
+
+        // Charger les icônes depuis le localStorage
+        function loadIcons() {
+            const savedIcons = JSON.parse(localStorage.getItem('icons')) || [];
+            savedIcons.forEach(data => {
+                createIcon(data.text, data.img, data.x, data.y);
+            });
+        }
+
+        // Sauvegarder les icônes dans le localStorage
+        function saveIcons() {
+            const icons = [...document.querySelectorAll('.icon')].map(icon => {
+                const text = icon.querySelector('span').textContent;
+                const img = icon.querySelector('img') ? icon.querySelector('img').src : null;
+                const x = icon.style.left;
+                const y = icon.style.top;
+                return { text, img, x, y };
+            });
+            localStorage.setItem('icons', JSON.stringify(icons));
+        }
+
+        // Créer une nouvelle icône
+        function createIcon(text = '', img = null, left = '50%', top = '50%') {
+            const icon = document.createElement('div');
+            icon.className = 'icon';
+            icon.style.left = left;
+            icon.style.top = top;
+            icon.innerHTML = `<span>${text}</span>`;
+            if (img) {
+                const image = document.createElement('img');
+                image.src = img;
+                icon.appendChild(image);
+            }
+            document.body.appendChild(icon);
+
+            // Ajouter les événements de drag
+            icon.draggable = true;
+            icon.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', '');
+                icon.dataset.offsetX = e.offsetX;
+                icon.dataset.offsetY = e.offsetY;
+            });
+
+            icon.addEventListener('dragend', (e) => {
+                const offsetX = parseInt(icon.dataset.offsetX, 10);
+                const offsetY = parseInt(icon.dataset.offsetY, 10);
+                icon.style.left = `${e.pageX - offsetX}px`;
+                icon.style.top = `${e.pageY - offsetY}px`;
+                saveIcons();
+            });
+
+            // Ouvrir le popup au clic
+            icon.addEventListener('click', () => {
+                activeIcon = icon;
+                const text = icon.querySelector('span').textContent;
+                const img = icon.querySelector('img');
+                iconTextInput.value = text;
+                iconImageInput.value = '';
+                popup.style.display = 'block';
+                overlay.style.display = 'block';
+            });
+        }
+
+        // Ajouter une nouvelle icône à partir du bouton
+        addButton.addEventListener('click', () => {
+            createIcon();
+            saveIcons();
+        });
+
+        // Sauvegarder les modifications d'une icône
+        saveIcon.addEventListener('click', () => {
+            if (activeIcon) {
+                const text = iconTextInput.value;
+                const file = iconImageInput.files[0];
+
+                // Mettre à jour le texte
+                activeIcon.querySelector('span').textContent = text;
+
+                // Mettre à jour l'image
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        let img = activeIcon.querySelector('img');
+                        if (!img) {
+                            img = document.createElement('img');
+                            activeIcon.appendChild(img);
+                        }
+                        img.src = e.target.result;
+                        saveIcons();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    saveIcons();
+                }
+
+                // Fermer le popup
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+            }
+        });
+
+        // Fermer le popup en cliquant sur l'overlay
+        overlay.addEventListener('click', () => {
+            popup.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+
+        // Charger les icônes au chargement de la page
+        window.addEventListener('load', loadIcons);
+    </script>
+</body>
+</html>
