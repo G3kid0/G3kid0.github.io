@@ -1,118 +1,94 @@
-// Initialiser Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+const addIconButton = document.getElementById('addIcon');
+const container = document.getElementById('iconContainer');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
-  authDomain: "frenchies-4d63a.firebaseapp.com",
-  databaseURL: "https://frenchies-4d63a-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "frenchies-4d63a",
-  storageBucket: "frenchies-4d63a.firebasestorage.app",
-  messagingSenderId: "270761793230",
-  appId: "1:270761793230:web:b4914660a81023dce1229f"
-};
+const popup = document.getElementById('popup');
+const imgUrlInput = document.getElementById('imgUrl');
+const iconTextInput = document.getElementById('iconText');
+const applyBtn = document.getElementById('applyChanges');
+const closeBtn = document.getElementById('closePopup');
 
-// Initialisation Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+let currentIcon = null;
 
-// Fonction pour générer un ID unique
-function generateId() {
-  return 'icon-' + Math.random().toString(36).substring(2, 15);
-}
+addIconButton.addEventListener('click', () => {
+  const icon = document.createElement('div');
+  icon.className = 'icon';
+  icon.style.left = '100px';
+  icon.style.top = '100px';
 
-// Fonction pour sauvegarder une icône dans Firebase
-function saveIcon(id, iconData) {
-  const iconRef = ref(db, 'icons/' + id);
-  set(iconRef, iconData)
-    .then(() => console.log("Icône sauvegardée !"))
-    .catch((error) => console.error("Erreur lors de la sauvegarde de l'icône", error));
-}
-
-// Fonction pour charger les icônes depuis Firebase
-function loadIcons() {
-  const iconsRef = ref(db, 'icons/');
-  get(iconsRef).then(snapshot => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      // Vider le conteneur avant de le remplir avec les nouvelles icônes
-      document.getElementById('container').innerHTML = '';
-      
-      Object.values(data).forEach(icon => {
-        const el = document.createElement('div');
-        el.className = 'icon';
-        el.style.left = icon.x;
-        el.style.top = icon.y;
-        el.dataset.id = icon.id;
-
-        // Ajouter une image si elle existe
-        if (icon.image) {
-          const img = document.createElement('img');
-          img.src = icon.image;
-          el.appendChild(img);
-        }
-
-        // Ajouter du texte si il existe
-        if (icon.text) {
-          const span = document.createElement('span');
-          span.textContent = icon.text;
-          el.appendChild(span);
-        }
-
-        // Ajouter l'icône à l'interface
-        document.getElementById('container').appendChild(el);
-
-        // Rendre l'icône déplaçable
-        el.addEventListener('mousedown', (e) => {
-          const offsetX = e.clientX - el.getBoundingClientRect().left;
-          const offsetY = e.clientY - el.getBoundingClientRect().top;
-
-          function onMouseMove(e) {
-            el.style.left = e.clientX - offsetX + 'px';
-            el.style.top = e.clientY - offsetY + 'px';
-          }
-
-          function onMouseUp() {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-
-            // Sauvegarder la nouvelle position dans Firebase
-            const id = el.dataset.id;
-            const newIconData = {
-              ...icon,
-              x: el.style.left,
-              y: el.style.top
-            };
-            saveIcon(id, newIconData);
-          }
-
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
-        });
-      });
-    } else {
-      console.log("Aucune donnée trouvée dans Firebase");
-    }
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentIcon = icon;
+    const img = icon.querySelector('img');
+    const span = icon.querySelector('span');
+    imgUrlInput.value = img ? img.src : '';
+    iconTextInput.value = span ? span.textContent : '';
+    popup.classList.remove('hidden');
   });
-}
 
-// Charger les icônes au démarrage
-loadIcons();
+  makeDraggable(icon);
+  container.appendChild(icon);
+});
 
-// Fonction pour ajouter une nouvelle icône
-document.getElementById('addIconButton').addEventListener('click', () => {
-  const id = generateId();
-  const newIconData = {
-    id: id,
-    x: '100px',  // Position initiale
-    y: '100px',  // Position initiale
-    image: '',   // Pas d'image par défaut
-    text: ''     // Pas de texte par défaut
+applyBtn.addEventListener('click', () => {
+  if (!currentIcon) return;
+
+  // Supprimer l'ancienne image ou span s'ils existent
+  currentIcon.querySelector('img')?.remove();
+  currentIcon.querySelector('span')?.remove();
+
+  const url = imgUrlInput.value.trim();
+  const text = iconTextInput.value.trim();
+
+  if (url) {
+    const img = document.createElement('img');
+    img.src = url;
+    currentIcon.appendChild(img);
+  }
+
+  if (text) {
+    const span = document.createElement('span');
+    span.textContent = text;
+    currentIcon.appendChild(span);
+  }
+
+  popup.classList.add('hidden');
+  currentIcon = null;
+});
+
+closeBtn.addEventListener('click', () => {
+  popup.classList.add('hidden');
+  currentIcon = null;
+});
+
+function makeDraggable(el) {
+  let offsetX, offsetY;
+
+  const onMove = (e) => {
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    el.style.left = (x - offsetX) + 'px';
+    el.style.top = (y - offsetY) + 'px';
   };
 
-  // Sauvegarder l'icône dans Firebase
-  saveIcon(id, newIconData);
+  const onUp = () => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+  };
 
-  // Recharger les icônes après l'ajout
-  loadIcons();
-});
+  el.addEventListener('mousedown', (e) => {
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  el.addEventListener('touchstart', (e) => {
+    const rect = el.getBoundingClientRect();
+    offsetX = e.touches[0].clientX - rect.left;
+    offsetY = e.touches[0].clientY - rect.top;
+    document.addEventListener('touchmove', onMove);
+    document.addEventListener('touchend', onUp);
+  });
+}
