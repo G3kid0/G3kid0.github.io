@@ -1,26 +1,3 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Icônes Mobiles</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="background">
-    <button id="addIcon">+</button>
-    <div id="iconContainer"></div>
-  </div>
-
-  <!-- Popup pour modifier l'icône -->
-  <div id="popup" class="popup hidden">
-    <label>Image URL : <input type="text" id="imgUrl" placeholder="https://..."/></label><br/>
-    <label>Texte : <input type="text" id="iconText" placeholder="Texte de l'icône"/></label><br/>
-    <button id="applyChanges">Appliquer</button>
-    <button id="closePopup">Annuler</button>
-  </div>
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
 <script type="module">
   // Importation des fonctions nécessaires depuis Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -53,17 +30,13 @@
     onValue(iconsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Remplir l'interface avec les icônes existantes
-        // Ici, tu peux utiliser ton code d'affichage des icônes.
+        Object.values(data).forEach(icon => {
+          // Remplir l'écran avec les icônes récupérées depuis Firebase
+        });
       }
     });
   }
 
-  // Appelle loadIcons pour récupérer les icônes au lancement de la page
+  // Charger les icônes à l'ouverture de la page
   loadIcons();
 </script>
-
-
-  <script src="script.js"></script>
-</body>
-</html>
