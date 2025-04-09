@@ -3,24 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page de création d'icônes</title>
-  <link rel="stylesheet" href="style.css">  <!-- Lien vers le fichier CSS -->
+  <title>Icônes Déplaçables</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Importer Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
 <body>
-
-  <!-- Conteneur pour les icônes -->
-  <div id="container"></div>
+  <div id="container">
+    <!-- Icônes seront ajoutées ici -->
+  </div>
 
   <!-- Bouton pour ajouter une nouvelle icône -->
   <button id="addIconButton">+ Ajouter une icône</button>
 
-  <!-- Importer Firebase SDK (version classique) -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
-
   <script>
     // Configuration Firebase
-    var firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
       authDomain: "frenchies-4d63a.firebaseapp.com",
       databaseURL: "https://frenchies-4d63a-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -31,35 +30,30 @@
     };
 
     // Initialisation Firebase
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.database();
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // Fonction pour générer un ID unique pour chaque icône
+    // Fonction pour générer un ID unique
     function generateId() {
-      return 'icon_' + Date.now();
+      return 'icon-' + Math.random().toString(36).substring(2, 15);
     }
 
     // Fonction pour sauvegarder une icône dans Firebase
     function saveIcon(id, iconData) {
       firebase.database().ref('icons/' + id).set(iconData)
-        .then(() => {
-          console.log("Icône sauvegardée !");
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la sauvegarde de l'icône", error);
-        });
+        .then(() => console.log("Icône sauvegardée !"))
+        .catch((error) => console.error("Erreur lors de la sauvegarde de l'icône", error));
     }
 
     // Fonction pour charger les icônes depuis Firebase
     function loadIcons() {
-      var iconsRef = firebase.database().ref('icons/');
-      iconsRef.on('value', function(snapshot) {
-        var data = snapshot.val();
+      const iconsRef = firebase.database().ref('icons/');
+      iconsRef.once('value', snapshot => {
+        const data = snapshot.val();
         if (data) {
-          // Supprimer toutes les icônes existantes avant de les recharger
+          // Vider le conteneur avant de le remplir avec les nouvelles icônes
           document.getElementById('container').innerHTML = '';
-
-          // Créer les icônes à partir des données Firebase
+          
           Object.values(data).forEach(icon => {
             const el = document.createElement('div');
             el.className = 'icon';
@@ -67,22 +61,19 @@
             el.style.top = icon.y;
             el.dataset.id = icon.id;
 
+            // Ajouter une image si elle existe
             if (icon.image) {
               const img = document.createElement('img');
               img.src = icon.image;
               el.appendChild(img);
             }
 
+            // Ajouter du texte si il existe
             if (icon.text) {
               const span = document.createElement('span');
               span.textContent = icon.text;
               el.appendChild(span);
             }
-
-            // Ajouter un écouteur d'événements pour les icônes
-            el.addEventListener('click', () => {
-              alert(`Icône cliquée: ${icon.text || 'Sans texte'}`);
-            });
 
             // Ajouter l'icône à l'interface
             document.getElementById('container').appendChild(el);
@@ -142,6 +133,5 @@
       loadIcons();
     });
   </script>
-
 </body>
 </html>
