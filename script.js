@@ -1,37 +1,45 @@
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-}
+const addIconButton = document.getElementById('addIcon');
+const container = document.getElementById('iconContainer');
 
-.background {
-  width: 100%;
-  height: 100%;
-  background-image: url('https://picsum.photos/800/600');
-  background-size: cover;
-  position: relative;
-}
+addIconButton.addEventListener('click', () => {
+  const icon = document.createElement('div');
+  icon.className = 'icon';
+  icon.style.left = '100px';
+  icon.style.top = '100px';
+  icon.textContent = '🔵';
+  makeDraggable(icon);
+  container.appendChild(icon);
+});
 
-#addIcon {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 24px;
-  padding: 10px;
-  z-index: 10;
-}
+function makeDraggable(el) {
+  let offsetX, offsetY;
 
-.icon {
-  width: 40px;
-  height: 40px;
-  background-color: rgba(255,255,255,0.9);
-  border: 2px solid black;
-  border-radius: 50%;
-  position: absolute;
-  touch-action: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
+  const onMove = (e) => {
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    el.style.left = (x - offsetX) + 'px';
+    el.style.top = (y - offsetY) + 'px';
+  };
+
+  const onUp = () => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+  };
+
+  el.addEventListener('mousedown', (e) => {
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  el.addEventListener('touchstart', (e) => {
+    const rect = el.getBoundingClientRect();
+    offsetX = e.touches[0].clientX - rect.left;
+    offsetY = e.touches[0].clientY - rect.top;
+    document.addEventListener('touchmove', onMove);
+    document.addEventListener('touchend', onUp);
+  });
 }
