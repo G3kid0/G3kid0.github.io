@@ -1,33 +1,54 @@
-/* Styles pour l'icône et le conteneur */
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f0f0;
+}
+
 #container {
   position: relative;
-  width: 100%;
-  height: 100vh;
+  width: 80%;
+  height: 80%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  overflow: hidden;
 }
 
 .icon {
   position: absolute;
   cursor: pointer;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  background-color: #2196F3;
+  color: white;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 5px;
 }
 
 .icon img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.icon span {
-  font-size: 12px;
-  margin-top: 5px;
+  width: 80%;
+  height: 80%;
 }
 
 button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   padding: 10px 20px;
   font-size: 16px;
-  margin: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
   cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
 }
