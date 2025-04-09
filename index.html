@@ -20,6 +20,12 @@
   <button id="addIconButton">+ Ajouter une icône</button>
 
   <script>
+    <script type="module">
+  // Configuration et initialisation de Firebase ici
+      import { initializeApp } from "firebase/app";
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
     // Configuration Firebase
    const firebaseConfig = {
 
@@ -38,7 +44,7 @@
   appId: "1:270761793230:web:b4914660a81023dce1229f"
 
 };
-
+const app = initializeApp(firebaseConfig);
 
     // Initialisation Firebase
     const app = firebase.initializeApp(firebaseConfig);
