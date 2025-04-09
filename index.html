@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Icônes Déplaçables</title>
   <link rel="stylesheet" href="style.css">
+  
   <!-- Importer Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
 </head>
 <body>
   <div id="container">
@@ -19,15 +21,24 @@
 
   <script>
     // Configuration Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
-      authDomain: "frenchies-4d63a.firebaseapp.com",
-      databaseURL: "https://frenchies-4d63a-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "frenchies-4d63a",
-      storageBucket: "frenchies-4d63a.firebasestorage.app",
-      messagingSenderId: "270761793230",
-      appId: "1:270761793230:web:b4914660a81023dce1229f"
-    };
+   const firebaseConfig = {
+
+  apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
+
+  authDomain: "frenchies-4d63a.firebaseapp.com",
+
+  databaseURL: "https://frenchies-4d63a-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+  projectId: "frenchies-4d63a",
+
+  storageBucket: "frenchies-4d63a.firebasestorage.app",
+
+  messagingSenderId: "270761793230",
+
+  appId: "1:270761793230:web:b4914660a81023dce1229f"
+
+};
+
 
     // Initialisation Firebase
     const app = firebase.initializeApp(firebaseConfig);
