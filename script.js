@@ -111,3 +111,42 @@ function makeDraggable(el) {
     document.addEventListener('touchend', onUp);
   });
 }
+
+// Chargement des icônes au lancement
+db.ref('icons').on('value', (snapshot) => {
+  container.innerHTML = ''; // Réinitialiser
+  const data = snapshot.val();
+  if (!data) return;
+
+  Object.values(data).forEach(icon => {
+    const el = document.createElement('div');
+    el.className = 'icon';
+    el.dataset.id = icon.id;
+    el.style.left = icon.x;
+    el.style.top = icon.y;
+
+    if (icon.image) {
+      const img = document.createElement('img');
+      img.src = icon.image;
+      el.appendChild(img);
+    }
+
+    if (icon.text) {
+      const span = document.createElement('span');
+      span.textContent = icon.text;
+      el.appendChild(span);
+    }
+
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentIcon = el;
+      imgUrlInput.value = icon.image || '';
+      iconTextInput.value = icon.text || '';
+      popup.classList.remove('hidden');
+    });
+
+    makeDraggable(el);
+    container.appendChild(el);
+  });
+});
+
