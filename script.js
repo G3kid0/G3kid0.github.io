@@ -1,14 +1,63 @@
 const addIconButton = document.getElementById('addIcon');
 const container = document.getElementById('iconContainer');
 
+const popup = document.getElementById('popup');
+const imgUrlInput = document.getElementById('imgUrl');
+const iconTextInput = document.getElementById('iconText');
+const applyBtn = document.getElementById('applyChanges');
+const closeBtn = document.getElementById('closePopup');
+
+let currentIcon = null;
+
 addIconButton.addEventListener('click', () => {
   const icon = document.createElement('div');
   icon.className = 'icon';
   icon.style.left = '100px';
   icon.style.top = '100px';
-  icon.textContent = '🔵';
+
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentIcon = icon;
+    const img = icon.querySelector('img');
+    const span = icon.querySelector('span');
+    imgUrlInput.value = img ? img.src : '';
+    iconTextInput.value = span ? span.textContent : '';
+    popup.classList.remove('hidden');
+  });
+
   makeDraggable(icon);
   container.appendChild(icon);
+});
+
+applyBtn.addEventListener('click', () => {
+  if (!currentIcon) return;
+
+  // Supprimer l'ancienne image ou span s'ils existent
+  currentIcon.querySelector('img')?.remove();
+  currentIcon.querySelector('span')?.remove();
+
+  const url = imgUrlInput.value.trim();
+  const text = iconTextInput.value.trim();
+
+  if (url) {
+    const img = document.createElement('img');
+    img.src = url;
+    currentIcon.appendChild(img);
+  }
+
+  if (text) {
+    const span = document.createElement('span');
+    span.textContent = text;
+    currentIcon.appendChild(span);
+  }
+
+  popup.classList.add('hidden');
+  currentIcon = null;
+});
+
+closeBtn.addEventListener('click', () => {
+  popup.classList.add('hidden');
+  currentIcon = null;
 });
 
 function makeDraggable(el) {
