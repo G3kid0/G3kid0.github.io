@@ -1,16 +1,35 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// Import the functions you need from the SDKs you need
 
-// Configuration Firebase
+import { initializeApp } from "firebase/app";
+
+// TODO: Add SDKs for Firebase products that you want to use
+
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+
+// Your web app's Firebase configuration
+
 const firebaseConfig = {
+
   apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
+
   authDomain: "frenchies-4d63a.firebaseapp.com",
+
   databaseURL: "https://frenchies-4d63a-default-rtdb.asia-southeast1.firebasedatabase.app",
+
   projectId: "frenchies-4d63a",
-  storageBucket: "frenchies-4d63a.appspot.com",
+
+  storageBucket: "frenchies-4d63a.firebasestorage.app",
+
   messagingSenderId: "270761793230",
+
   appId: "1:270761793230:web:b4914660a81023dce1229f"
+
 };
+
+
+// Initialize Firebase
+
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
