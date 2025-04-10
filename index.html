@@ -12,21 +12,18 @@
     <div id="iconContainer"></div>
   </div>
 
-  <!-- Popup pour modifier l'icône -->
   <div id="popup" class="popup hidden">
     <label>Image URL : <input type="text" id="imgUrl" placeholder="https://..."/></label><br/>
     <label>Texte : <input type="text" id="iconText" placeholder="Texte de l'icône"/></label><br/>
     <button id="applyChanges">Appliquer</button>
     <button id="closePopup">Annuler</button>
   </div>
-<!-- Ajouter les scripts Firebase depuis les CDN -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<!-- Votre fichier de script, sans "import" -->
-<script src="script.js"></script>
+  <!-- Firebase SDK compatibilité navigateur -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <!-- Charger le script comme un module -->
-
+  <!-- Script principal -->
+  <script src="script.js"></script>
 </body>
 </html>
