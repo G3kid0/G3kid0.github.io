@@ -17,7 +17,7 @@ const addIconButton = document.getElementById('addIcon');
 const container = document.getElementById('iconContainer');
 
 const popup = document.getElementById('popup');
-const imgUrlInput = document.getElementById('imgUrl');
+const imgFileInput = document.getElementById('imgFile');
 const iconTextInput = document.getElementById('iconText');
 const applyBtn = document.getElementById('applyChanges');
 const closeBtn = document.getElementById('closePopup');
@@ -50,7 +50,7 @@ addIconButton.addEventListener('click', () => {
 applyBtn.addEventListener('click', () => {
   if (!currentKey) return;
 
-  const url = imgUrlInput.value.trim();
+  const file = imgFileInput.files[0];
   const text = iconTextInput.value.trim();
 
   db.ref('icons/' + currentKey).update({
@@ -73,11 +73,15 @@ function createIconElement(data, key) {
   icon.style.left = data.left + 'px';
   icon.style.top = data.top + 'px';
 
-  if (data.url) {
+  if (file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
     const img = document.createElement('img');
-    img.src = data.url;
-    icon.appendChild(img);
-  }
+    img.src = e.target.result;
+    currentIcon.appendChild(img);
+  };
+  reader.readAsDataURL(file);
+}
 
   if (data.text) {
     const span = document.createElement('span');
