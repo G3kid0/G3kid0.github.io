@@ -1,9 +1,22 @@
 
+const firebaseConfig = {
+  apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
+  authDomain: "frenchies-4d63a.firebaseapp.com",
+  databaseURL: "https://frenchies-4d63a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "frenchies-4d63a",
+  storageBucket: "frenchies-4d63a.appspot.com",
+  messagingSenderId: "270761793230",
+  appId: "1:270761793230:web:b4914660a81023dce1229f"
+};
+
+// Initialisation Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
 // Initialize Firebase
 
 
-const app = initializeApp(firebaseConfig);
+//const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // 🔧 Ton code existant
