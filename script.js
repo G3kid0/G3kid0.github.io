@@ -1,4 +1,4 @@
-
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBGXjguIegEK6bZl_u7kzBUVku8oJXcCPM",
   authDomain: "frenchies-4d63a.firebaseapp.com",
@@ -9,17 +9,10 @@ const firebaseConfig = {
   appId: "1:270761793230:web:b4914660a81023dce1229f"
 };
 
-// Initialisation Firebase
+// Initialiser Firebase
 firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+const db = firebase.database();
 
-// Initialize Firebase
-
-
-//const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// 🔧 Ton code existant
 const addIconButton = document.getElementById('addIcon');
 const container = document.getElementById('iconContainer');
 
@@ -30,23 +23,91 @@ const applyBtn = document.getElementById('applyChanges');
 const closeBtn = document.getElementById('closePopup');
 
 let currentIcon = null;
+let currentKey = null;
 
-function generateId() {
-  return 'icon-' + Math.random().toString(36).substring(2, 9);
+// Charger les icônes depuis Firebase
+firebase.database().ref('icons').on('value', (snapshot) => {
+  container.innerHTML = '';
+  const data = snapshot.val();
+  if (data) {
+    Object.entries(data).forEach(([key, iconData]) => {
+      createIconElement(iconData, key);
+    });
+  }
+});
+
+addIconButton.addEventListener('click', () => {
+  const iconData = {
+    left: 100,
+    top: 100,
+    url: '',
+    text: ''
+  };
+  const key = db.ref('icons').push().key;
+  db.ref('icons/' + key).set(iconData);
+});
+
+applyBtn.addEventListener('click', () => {
+  if (!currentKey) return;
+
+  const url = imgUrlInput.value.trim();
+  const text = iconTextInput.value.trim();
+
+  db.ref('icons/' + currentKey).update({
+    url: url,
+    text: text
+  });
+
+  popup.classList.add('hidden');
+  currentKey = null;
+});
+
+closeBtn.addEventListener('click', () => {
+  popup.classList.add('hidden');
+  currentKey = null;
+});
+
+function createIconElement(data, key) {
+  const icon = document.createElement('div');
+  icon.className = 'icon';
+  icon.style.left = data.left + 'px';
+  icon.style.top = data.top + 'px';
+
+  if (data.url) {
+    const img = document.createElement('img');
+    img.src = data.url;
+    icon.appendChild(img);
+  }
+
+  if (data.text) {
+    const span = document.createElement('span');
+    span.textContent = data.text;
+    icon.appendChild(span);
+  }
+
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentKey = key;
+    imgUrlInput.value = data.url || '';
+    iconTextInput.value = data.text || '';
+    popup.classList.remove('hidden');
+  });
+
+  makeDraggable(icon, key);
+  container.appendChild(icon);
 }
 
-function saveIcon(id, data) {
-  set(ref(db, 'icons/' + id), data);
-}
-
-function makeDraggable(el, id) {
+function makeDraggable(el, key) {
   let offsetX, offsetY;
 
   const onMove = (e) => {
     const x = e.touches ? e.touches[0].clientX : e.clientX;
     const y = e.touches ? e.touches[0].clientY : e.clientY;
-    el.style.left = (x - offsetX) + 'px';
-    el.style.top = (y - offsetY) + 'px';
+    const left = x - offsetX;
+    const top = y - offsetY;
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+    db.ref('icons/' + key).update({ left, top });
   };
 
   const onUp = () => {
@@ -54,13 +115,6 @@ function makeDraggable(el, id) {
     document.removeEventListener('mouseup', onUp);
     document.removeEventListener('touchmove', onMove);
     document.removeEventListener('touchend', onUp);
-
-    // Sauvegarder position
-    const x = el.style.left;
-    const y = el.style.top;
-    const img = el.querySelector('img')?.src || '';
-    const text = el.querySelector('span')?.textContent || '';
-    saveIcon(id, { x, y, image: img, text });
   };
 
   el.addEventListener('mousedown', (e) => {
@@ -78,60 +132,3 @@ function makeDraggable(el, id) {
     document.addEventListener('touchend', onUp);
   });
 }
-
-addIconButton.addEventListener('click', () => {
-  const id = generateId();
-  const icon = document.createElement('div');
-  icon.className = 'icon';
-  icon.style.left = '100px';
-  icon.style.top = '100px';
-  icon.dataset.id = id;
-
-  icon.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentIcon = icon;
-    const img = icon.querySelector('img');
-    const span = icon.querySelector('span');
-    imgUrlInput.value = img ? img.src : '';
-    iconTextInput.value = span ? span.textContent : '';
-    popup.classList.remove('hidden');
-  });
-
-  makeDraggable(icon, id);
-  container.appendChild(icon);
-  saveIcon(id, { x: '100px', y: '100px', image: '', text: '' });
-});
-
-applyBtn.addEventListener('click', () => {
-  if (!currentIcon) return;
-  currentIcon.querySelector('img')?.remove();
-  currentIcon.querySelector('span')?.remove();
-
-  const url = imgUrlInput.value.trim();
-  const text = iconTextInput.value.trim();
-
-  if (url) {
-    const img = document.createElement('img');
-    img.src = url;
-    currentIcon.appendChild(img);
-  }
-
-  if (text) {
-    const span = document.createElement('span');
-    span.textContent = text;
-    currentIcon.appendChild(span);
-  }
-
-  const id = currentIcon.dataset.id;
-  const x = currentIcon.style.left;
-  const y = currentIcon.style.top;
-  saveIcon(id, { x, y, image: url, text });
-
-  popup.classList.add('hidden');
-  currentIcon = null;
-});
-
-closeBtn.addEventListener('click', () => {
-  popup.classList.add('hidden');
-  currentIcon = null;
-});
