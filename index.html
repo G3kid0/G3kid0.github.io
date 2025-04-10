@@ -12,18 +12,20 @@
     <div id="iconContainer"></div>
   </div>
 
+  <!-- Popup pour modifier l'icône -->
   <div id="popup" class="popup hidden">
-    <label>Image depuis l'appareil : <input type="file" id="imgFile" accept="image/*"/></label><br/>
-    <label>Texte : <input type="text" id="iconText" placeholder="Texte de l'icône"/></label><br/>
+    <label>Image depuis l'appareil :
+      <input type="file" id="imgFile" accept="image/*"/>
+    </label><br/>
+    <label>Texte :
+      <input type="text" id="iconText" placeholder="Texte de l'icône"/>
+    </label><br/>
     <button id="applyChanges">Appliquer</button>
     <button id="closePopup">Annuler</button>
   </div>
 
-  <!-- Firebase SDK compatibilité navigateur -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <!-- Script principal -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
